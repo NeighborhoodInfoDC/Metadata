@@ -19,7 +19,7 @@
 
 /*** USE THIS CODE TO DELETE A LIBRARY
 %Delete_metadata_library(  
-         ds_lib=VSTATS,
+         ds_lib={libname},
          meta_lib=Metadata )
 /***/
 
@@ -34,8 +34,18 @@
 )
 
 %DC_update_meta_library(
+  lib_name=Bainum,
+  lib_desc=Bainum Family Foundation project
+)
+
+%DC_update_meta_library(
   lib_name=bpermits,
   lib_desc=Building permits
+)
+
+%DC_update_meta_library(
+  lib_name=BridgePk,
+  lib_desc=11th Street Bridge Park project
 )
 
 %DC_update_meta_library(
