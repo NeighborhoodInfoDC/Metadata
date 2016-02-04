@@ -20,7 +20,6 @@
    usernames longer than 8 characters.
  
  Modifications:
-  07/27/14 PAT Added kabazajian.
 **************************************************************************/
 
 %include "L:\SAS\Inc\StdLocal.sas";
@@ -28,17 +27,19 @@
 ** Define libraries **;
 %DCData_lib( Metadata, local=n )
 
-proc format library=Metada_r;
+proc format library=Metadata;
   value $creator
     "ptatian"  = "P Tatian"
     "awilliam" = "A Williams"
     "awilliams" = "A Williams"
+    "chedman" = "C Hedman"
     "lgetsing" = "L Getsinger"
     "lgetsinger" = "L Getsinger"
     "eguernse" = "E Guernsey"
     "lhendey"  = "L Hendey"
     "rrosso"   = "R Rosso"
     "jfenders" = "J Fenderson"
+    "jdev" = "J Dev"
     "bchang"   = "B Chang"
     "dprice"   = "D Price"
     "mgrosz"   = "M Grosz"
@@ -62,14 +63,14 @@ proc format library=Metada_r;
 
 run;
 
-proc catalog catalog=Metada_r.formats;
+proc catalog catalog=Metadata.formats;
   modify creator (desc="File creator names") / entrytype=formatc;
   contents;
 quit;
 
 run;
 
-proc format library=Metada_r fmtlib;
+proc format library=Metadata fmtlib;
   select $creator;
 run;
 
