@@ -59,6 +59,7 @@ proc format library=Metadata;
     "sizhang" = "S Zhang"
     "mwoluchem" = "M Woluchem"
     "kabazajian" = "K Abazajian"
+    "mcohen" = "M Cohen"
   ;
 
 run;
