@@ -89,6 +89,11 @@
 )
 
 %DC_update_meta_library(
+  lib_name=Equity,
+  lib_desc=DC Racial Equity Profile
+)
+
+%DC_update_meta_library(
   lib_name=FairHsng,
   lib_desc=DC Analysis of Impediments to Fair Housing 
 )
