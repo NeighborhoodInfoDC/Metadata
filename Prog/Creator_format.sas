@@ -53,6 +53,7 @@ proc format library=Metadata;
     "rgrace" = "R Grace"
     "rpitingolo" = "R Pitingolo"
     "rpitingo" = "R Pitingolo"
+    "sdiby" = "S Diby"
     "slitschwartz" = "S Litschwartz"
     "slitschw" = "S Litschwartz"
     "blosoya" = "B Losoya"
