@@ -17,6 +17,8 @@
 ** Define libraries **;
 %DCData_lib( Metadata, local=n )
 
+%let RRCATMAX = 10;
+
 data Test;
 
   length
@@ -82,6 +84,8 @@ data Test;
     CategoricalVariableDescriptors $ 2000
   ;
   
+  ** Constant value variables (same for all data sets) **;
+  
   retain
     Type "Data Set"
     Community "NeighborhoodInfo DC"
@@ -100,7 +104,6 @@ data Test;
     ClByRRCategoryCommunity "Urban Institute"
     ClByRRCategoryDomainType "Business Dimensions"
     ClByRRCategoryDomain "Urban Data Classifications"
-    ClByRRCategoryRRCategory "Neighborhoods, Cities, and Metros" /** ENTER MULTIPLE CATEGORIES? **/
     ClByDataValueType "Data Value"
     ClByDataValueCommunity "Urban Institute"
     ClByDataValueDomainType "Business Dimensions"
@@ -110,7 +113,6 @@ data Test;
     ClByRestrictionCommunity "Urban Institute"
     ClByRestrictionDomainType "Business Dimensions"
     ClByRestrictionDomain "Urban Data Classifications"
-    ClByRestrictionRestriction "Public"
     Status "Approved"
     Cost "Free"
     InstructionstoAccesstheData "Email NeighborhoodInfoDC@urban.org"
@@ -120,8 +122,48 @@ data Test;
     AdditionalTags ""
     LinktoDataDictionaryPDF ""
   ;
+
+  ** Data set specific value variables **;
+  
+  retain
+    Type
+    LastUpdated
+    TimeCoveragePeriodStartDate
+    TimeCoveragePeriodEndDate
+    RolesPrimaryContactFirstName
+    RolesPrimaryContactLastName 
+    RolesPrimaryContactUserName
+    FrequencyofUpdate 
+    ClByGeoLevelGeographicLevel 
+    ClByRRCategoryRRCategory
+    ClByRestrictionRestriction
+    Description 
+    Unitsofobservation 
+    Originaldatasourceinformation 
+    URLoforiginaldatasource 
+    ProjectCode 
+    UniverseTargetPopulation 
+    Individualdatasetsinseries 
+    LocationtoAccesstheData 
+    AdditionalNotes 
+    ConsiderationsorLimitations 
+    CommentsonDataQuality 
+    LinktoDataUseAgreementorMOU 
+    Library
+  ;
+  
+  ** Processing vars **;
+
+  length _RRCategories _RRCat1-_RRCat&RRCATMAX $ 80;
+  
+  retain 
+    _RRCategories 
+    _RRCat1-_RRCat&RRCATMAX
+    _RRCatNum
+  ;
   
   set Metadata.Meta_files;
+  by Library FileName;
   where upcase(Library) = "POLICE" and upcase(FileName) = "CRIMES_SUM_ANC12";
   
   Name = propcase( FileName );
@@ -133,10 +175,12 @@ data Test;
   **** HARD CODING THIS FOR NOW, BUT MAY WANT TO CHANGE LATER ****;
   RolesPrimaryContactFirstName = "P";        
   RolesPrimaryContactLastName = "Tatian";
-  RolesPrimaryContactUserName = "ptatian";
+  RolesPrimaryContactUserName = "Peter";
   
   FrequencyofUpdate = "Annual";
   ClByGeoLevelGeographicLevel = "Not on this list";
+
+  ClByRestrictionRestriction = "Public";
 
   Description = FileDesc;
   Unitsofobservation = "Advisory Neighborhood Commission (2012)";
@@ -148,7 +192,7 @@ data Test;
   UniverseTargetPopulation = "Reported part 1 crimes, DC";
   Individualdatasetsinseries = "";
   
-  LocationtoAccesstheData = "SAS1 server, DCData\Libraries\Police";
+  LocationtoAccesstheData = "SAS1 server, DCData/Libraries/Police";
   
   AdditionalNotes = "";
 
@@ -157,9 +201,64 @@ data Test;
   LinktoDataUseAgreementorMOU = "";
   
   Library = propcase( Library );
+  
+  
+  ** Generate output obs for each R&R category, numeric var, and categorical var **;
+  
+  array _RRCat{*} _RRCat1-_RRCat&RRCATMAX;
+  
+  _RRCategories = "Neighborhoods, Cities, and Metros|Crime and Justice";
+  
+  ** Parse R&R categories **;
+  
+  do i = 1 to &RRCATMAX;
+    _RRCat{i} = scan( _RRCategories, i, '|' );
+    if _RRCat{i} = "" then leave;
+  end;
+  
+  _RRCatNum = i - 1;
+  PUT _RRCATNUM=;
 
   NumericVariableDescriptors = "";
-  CategoricalVariableDescriptors = "";
+
+  CategoricalVariableDescriptors = "<table style=""border-collapse: collapse;"">" ||
+  "<tr><th style=""border-bottom: 1px solid #000; padding: 2px 10px 2px 10px;"">Variable</th><th style=""border-bottom: 1px solid #000; padding: 2px 10px 2px 10px;"">N</th></tr>" ||
+  "<tr><td style=""padding: 2px 10px 2px 10px;"">Ward</td><td style=""padding: 2px 10px 2px 10px;"">1</td></tr>" ||
+  "<tr><td style=""background-color: #EEE; padding: 2px 10px 2px 10px;"">Ward</td><td style=""background-color: #EEE; padding: 2px 10px 2px 10px;"">2</td></tr>" ||
+  "<tr><td style=""padding: 2px 10px 2px 10px;"">Ward</td><td style=""padding: 2px 10px 2px 10px;"">3</td></tr>" ||
+  "<tr><td style=""background-color: #EEE; padding: 2px 10px 2px 10px;"">Ward</td><td style=""background-color: #EEE; padding: 2px 10px 2px 10px;"">4</td></tr>" ||
+  "</table>"
+  ;
+  
+  if first.Filename then do;
+  
+    ClByRRCategoryRRCategory = "";
+    
+  end;
+  
+  if last.FileName then do;
+  
+    if _RRCatNum > 0 then do;
+      do i = _RRCatNum to 1 by -1;
+        ClByRRCategoryRRCategory = _RRCat{i};
+        output;
+      end;
+    end;
+    else do;
+      output;
+    end;
+    
+  end;
+  else do;
+  
+    if _RRCatNum > 0 then do;
+      ClByRRCategoryRRCategory = _RRCat{_RRCatNum};
+      _RRCatNum = _RRCatNum - 1;
+    end;
+    
+    output;
+    
+  end;
 
   format 
     LastUpdated TimeCoveragePeriodStartDate TimeCoveragePeriodEndDate mmddyy10.;
