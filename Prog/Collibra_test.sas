@@ -22,7 +22,7 @@
 ** Resort variable metadata **;
 
 proc sort data=Metadata.Meta_vars out=Meta_vars;
-  where upcase(Library) = "POLICE" and upcase(FileName) = "CRIMES_SUM_ANC12" and not( missing( _desc_n ) );
+  where upcase(Library) = "POLICE" and upcase(FileName) =: "CRIMES_SUM_" and not( missing( _desc_n ) );
   by Library FileName descending VarNameUC;
 
 ** Create export file **;
@@ -172,7 +172,7 @@ data Test;
   
   merge Metadata.Meta_files Meta_vars (keep=Library FileName VarName VarDesc _desc_:);
   by Library FileName;
-  where upcase(Library) = "POLICE" and upcase(FileName) = "CRIMES_SUM_ANC12";
+  where upcase(Library) = "POLICE" and upcase(FileName) =: "CRIMES_SUM_";
   
   Name = propcase( FileName );
   LastUpdated = datepart( FileUpdated );
@@ -191,7 +191,50 @@ data Test;
   ClByRestrictionRestriction = "Public";
 
   Description = FileDesc;
-  Unitsofobservation = "Advisory Neighborhood Commission (2012)";
+  
+  ** TEMPORARY CODE **;
+  select( lowcase( substr( FileName, 11 ) ) );
+    when ( "_anc02" )
+      Unitsofobservation = "Advisory Neighborhood Commission (2002)";
+    when ( "_anc12" )
+      Unitsofobservation = "Advisory Neighborhood Commission (2012)";
+    when ( "_city" )
+      Unitsofobservation = "City total";
+    when ( "_cl00" )
+      Unitsofobservation = "Neighborhood cluster (2000)";
+    when ( "_cltr00" )
+      Unitsofobservation = "Neighborhood cluster (tract-based, 2000)";
+    when ( "_eor" )
+      Unitsofobservation = "East of the Anacostia River";
+    when ( "_tr00" )
+      Unitsofobservation = "Census tract (2000)";
+    when ( "_tr10" )
+      Unitsofobservation = "Census tract (2010)";
+    when ( "_bg00" )
+      Unitsofobservation = "Census block group (2000)";
+    when ( "_bg10" )
+      Unitsofobservation = "Census block group (2010)";
+    when ( "_bl00" )
+      Unitsofobservation = "Census block (2000)";
+    when ( "_bl10" )
+      Unitsofobservation = "Census block (2010)";
+    when ( "_psa04" )
+      Unitsofobservation = "Police Service Area (2004)";
+    when ( "_psa12" )
+      Unitsofobservation = "Police Service Area (2012)";
+    when ( "_vp12" )
+      Unitsofobservation = "Voting Precinct (2012)";
+    when ( "_wd02" )
+      Unitsofobservation = "Ward (2002)";
+    when ( "_wd12" )
+      Unitsofobservation = "Ward (2012)";
+    when ( "_zip" )
+      Unitsofobservation = "ZIP code (5 digit)";
+    otherwise do;
+      %err_put( msg="NOT FOUND!" )
+      Unitsofobservation = "Unknown";
+    end;
+  end;
 
   Originaldatasourceinformation = "DC Open Data";
   URLoforiginaldatasource = '<a href="http://opendata.dc.gov/"></a>';
@@ -248,22 +291,22 @@ data Test;
   trim( VarName ) ||
   "</td>" ||
   "<td style=""padding: 2px 10px 2px 10px;"">" ||
-  left( _desc_n ) ||
+  trim( left( _desc_n ) ) ||
   "</td>" ||
   "<td style=""padding: 2px 10px 2px 10px;"">" ||
-  left( _desc_sum ) ||
+  trim( left( _desc_sum ) ) ||
   "</td>" ||
   "<td style=""padding: 2px 10px 2px 10px;"">" ||
-  left( _desc_mean ) ||
+  trim( left( _desc_mean ) ) ||
   "</td>" ||
   "<td style=""padding: 2px 10px 2px 10px;"">" ||
-  left( _desc_std ) ||
+  trim( left( _desc_std ) ) ||
   "</td>" ||
   "<td style=""padding: 2px 10px 2px 10px;"">" ||
-  left( _desc_min ) ||
+  trim( left( _desc_min ) ) ||
   "</td>" ||
   "<td style=""padding: 2px 10px 2px 10px;"">" ||
-  left( _desc_max ) ||
+  trim( left( _desc_max ) ) ||
   "</td>" ||
   "</tr>" ||
   
@@ -444,7 +487,7 @@ data Test;
 
 run;
 
-%File_info( data=Test )
+%File_info( data=Test, printobs=0 )
 
 /*
 filename fexport "Collibra_test.csv" lrecl=5000;
