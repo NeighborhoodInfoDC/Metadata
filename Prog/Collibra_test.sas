@@ -19,6 +19,14 @@
 
 %let RRCATMAX = 10;
 
+** Resort variable metadata **;
+
+proc sort data=Metadata.Meta_vars out=Meta_vars;
+  where upcase(Library) = "POLICE" and upcase(FileName) = "CRIMES_SUM_ANC12" and not( missing( _desc_n ) );
+  by Library FileName descending VarNameUC;
+
+** Create export file **;
+
 data Test;
 
   length
@@ -162,7 +170,7 @@ data Test;
     _RRCatNum
   ;
   
-  set Metadata.Meta_files;
+  merge Metadata.Meta_files Meta_vars (keep=Library FileName VarName VarDesc _desc_:);
   by Library FileName;
   where upcase(Library) = "POLICE" and upcase(FileName) = "CRIMES_SUM_ANC12";
   
@@ -219,8 +227,52 @@ data Test;
   _RRCatNum = i - 1;
   PUT _RRCATNUM=;
 
-  NumericVariableDescriptors = "";
+  NumericVariableDescriptors = 
+  
+  "<table style=""border-collapse: collapse;"">" ||
+  
+  "<tr>" ||
+  "<th style=""border-bottom: 1px solid #000; padding: 2px 10px 2px 10px;"">" ||
+  trim( VarDesc ) ||
+  "</th>" ||
+  "<th style=""border-bottom: 1px solid #000; padding: 2px 10px 2px 10px;"">N</th>" || 
+  "<th style=""border-bottom: 1px solid #000; padding: 2px 10px 2px 10px;"">Sum</th>" || 
+  "<th style=""border-bottom: 1px solid #000; padding: 2px 10px 2px 10px;"">Mean</th>" || 
+  "<th style=""border-bottom: 1px solid #000; padding: 2px 10px 2px 10px;"">StdDev</th>" || 
+  "<th style=""border-bottom: 1px solid #000; padding: 2px 10px 2px 10px;"">Min</th>" || 
+  "<th style=""border-bottom: 1px solid #000; padding: 2px 10px 2px 10px;"">Max</th>" || 
+  "</tr>" ||
 
+  "<tr>" ||
+  "<td style=""padding: 2px 10px 2px 10px;"">" ||
+  trim( VarName ) ||
+  "</td>" ||
+  "<td style=""padding: 2px 10px 2px 10px;"">" ||
+  left( _desc_n ) ||
+  "</td>" ||
+  "<td style=""padding: 2px 10px 2px 10px;"">" ||
+  left( _desc_sum ) ||
+  "</td>" ||
+  "<td style=""padding: 2px 10px 2px 10px;"">" ||
+  left( _desc_mean ) ||
+  "</td>" ||
+  "<td style=""padding: 2px 10px 2px 10px;"">" ||
+  left( _desc_std ) ||
+  "</td>" ||
+  "<td style=""padding: 2px 10px 2px 10px;"">" ||
+  left( _desc_min ) ||
+  "</td>" ||
+  "<td style=""padding: 2px 10px 2px 10px;"">" ||
+  left( _desc_max ) ||
+  "</td>" ||
+  "</tr>" ||
+  
+  "</table>"
+  ;
+
+  CategoricalVariableDescriptors = "";
+
+  /*
   CategoricalVariableDescriptors = "<table style=""border-collapse: collapse;"">" ||
   "<tr><th style=""border-bottom: 1px solid #000; padding: 2px 10px 2px 10px;"">Variable</th><th style=""border-bottom: 1px solid #000; padding: 2px 10px 2px 10px;"">N</th></tr>" ||
   "<tr><td style=""padding: 2px 10px 2px 10px;"">Ward</td><td style=""padding: 2px 10px 2px 10px;"">1</td></tr>" ||
@@ -229,6 +281,7 @@ data Test;
   "<tr><td style=""background-color: #EEE; padding: 2px 10px 2px 10px;"">Ward</td><td style=""background-color: #EEE; padding: 2px 10px 2px 10px;"">4</td></tr>" ||
   "</table>"
   ;
+  */
   
   if first.Filename then do;
   
