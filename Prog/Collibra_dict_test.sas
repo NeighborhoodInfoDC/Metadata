@@ -18,6 +18,8 @@
 ** Define libraries **;
 %DCData_lib( Metadata, local=n )
 
+%let Library_select = POLICE;
+%let File_select = CRIMES_SUM;
 
 ** Create export file **;
 
@@ -62,7 +64,7 @@ data Dict_test;
   
   set Metadata.Meta_vars (keep=Library FileName VarName VarDesc);
   by Library FileName;
-  where upcase(Library) = "POLICE" and upcase(FileName) =: "CRIMES_SUM_";
+  where upcase(Library) = "%upcase(&Library_select)" and upcase(FileName) =: "%upcase(&File_select)";
   
   Name = VarName;
   Description = VarDesc;

@@ -17,13 +17,114 @@
 ** Define libraries **;
 %DCData_lib( Metadata, local=n )
 
+%let Library_select = POLICE;
+%let File_select = CRIMES_SUM;
+
 %let RRCATMAX = 10;
+%let FVALMAX = 80;
+
+%let date_fmts =
+  "/DATE/DATEAMPM/DATETIME/DAY/DDMMYY/" ||
+  "/DDMMYYB/DDMMYYC/DDMMYYD/DDMMYYN/DDMMYYP/DDMMYYS/" ||
+  "/DOWNAME/DTDATE/DTMONYY/DTWKDATX/DTYEAR/DTYYQC/" ||
+  "/EURDFDD/EURDFDE/EURDFDN/EURDFDT/EURDFDWN/EURDFMN/EURDFMY/EURDFWDX/EURDFWKX/" ||
+  "/HDATE/HEBDATE/HHMM/HOUR/JULDAY/JULIAN/MINGUO/MMDDYY/" ||
+  "/MMDDYYB/MMDDYYC/MMDDYYD/MMDDYYN/MMDDYYP/MMDDYYS/" ||
+  "/MMSS/MMYY/" ||
+  "/MMYYC/MMYYD/MMYYN/MMYYP/MMYYS/" ||
+  "/MONNAME/MONTH/MONYY/NENGO/NLDATE/NLDATEMN/NLDATEW/NLDATEWN/NLDATM/NLDATMAP/" ||
+  "/NLDATMTM/NLDATMW/NLTIMAP/NLTIME/PDJULG/PDJULI/QTR/QTRR/TIME/TIMEAMPM/" ||
+  "/TOD/WEEKDATE/WEEKDATX/WEEKDAY/WEEKU/WEEKV/WEEKW/WORDDATE/WORDDATX/YEAR/YYMM/" ||
+  "/YYMMC/YYMMD/YYMMN/YYMMP/YYMMS/" ||
+  "/YYMMDD/" ||
+  "/YYMMDDB/YYMMDDC/YYMMDDD/YYMMDDN/YYMMDDP/YYMMDDS/" ||
+  "/YYMON/YYQ/" ||
+  "/YYQC/YYQD/YYQN/YYQP/YYQS/" ||
+  "/YYQR/" ||
+  "/YYQRC/YYQRD/YYQRN/YYQRP/YYQRS/";
+
+** Process categorical var info **;
+
+data Cat_vars;
+
+  set Metadata.Meta_fval;
+  by Library FileName VarNameUC;
+  where upcase(Library) = "%upcase(&Library_select)" and upcase(FileName) =: "%upcase(&File_select)";
+  
+  length Fval_val1-Fval_val&FVALMAX $ 40 Fval_fval1-Fval_fval&FVALMAX $ 80;
+  
+  retain Fval_val1-Fval_val&FVALMAX Fval_fval1-Fval_fval&FVALMAX Fval_freq1-Fval_freq&FVALMAX;
+  
+  array Fval_val{*} Fval_val1-Fval_val&FVALMAX;
+  array Fval_fval{*} Fval_fval1-Fval_fval&FVALMAX;
+  array Fval_freq{*} Fval_freq1-Fval_freq&FVALMAX;
+  
+  retain Fval_count;
+  
+  if first.VarNameUC then do;
+    Fval_count = 0;
+    do i = 1 to dim( Fval_val );
+      Fval_val{i} = "";
+      Fval_fval{i} = "";
+      Fval_freq{i} = .;
+    end;
+  end;
+  
+  Fval_count + 1;
+  
+  if Fval_count > &FVALMAX then do;
+    %err_put( msg="Maximum number of formatted values (&FVALMAX) exceeded. " Library= FileName= VarName= )
+    abort;
+  end;
+  
+  Fval_val{Fval_count} = Value;
+  Fval_fval{Fval_count} = FmtValue;
+  Fval_freq{Fval_count} = Frequency;
+  
+  if last.VarNameUC then do;
+    output;
+  end;
+  
+  keep Library FileName VarNameUC MaxFmtVals Fval_: ;
+  
+run;
+
+proc sort data=Cat_vars;
+  by Library FileName descending VarNameUC;
+run;
+
 
 ** Resort variable metadata **;
 
 proc sort data=Metadata.Meta_vars out=Meta_vars;
-  where upcase(Library) = "POLICE" and upcase(FileName) =: "CRIMES_SUM_" and not( missing( _desc_n ) );
+  where upcase(Library) = "%upcase(&Library_select)" and upcase(FileName) =: "%upcase(&File_select)";
   by Library FileName descending VarNameUC;
+
+
+** Combine variable and value metadata **;
+
+data All_vars;
+
+  merge
+    Meta_vars (keep=Library FileName VarName VarNameUC VarDesc VarFmt _desc_:) 
+    Cat_vars;
+  by Library FileName descending VarNameUC;
+  
+  if not( missing( _desc_n ) ) or Fval_count > 0;
+  
+run;
+
+%Dup_check(
+  data=All_vars,
+  by=Library FileName VarNameUC,
+  id=,
+  out=_dup_check,
+  listdups=Y,
+  count=dup_check_count,
+  quiet=N,
+  debug=N
+)
+
 
 ** Create export file **;
 
@@ -87,7 +188,7 @@ data Data_test;
     LinktoDataDictionaryPDF $ 1000
     Library $ 32
     NumericVariableDescriptors $ 2000
-    CategoricalVariableDescriptors $ 2000
+    CategoricalVariableDescriptors $ 32767
   ;
   
   ** Constant value variables (same for all data sets) **;
@@ -165,15 +266,17 @@ data Data_test;
     _RRCatNum
   ;
   
-  merge Metadata.Meta_files Meta_vars (keep=Library FileName VarName VarDesc _desc_:);
+  merge 
+    Metadata.Meta_files 
+    All_vars;
   by Library FileName;
-  where upcase(Library) = "POLICE" and upcase(FileName) =: "CRIMES_SUM_";
+  where upcase(Library) = "%upcase(&Library_select)" and upcase(FileName) =: "%upcase(&File_select)";
   
   Name = propcase( FileName );
   LastUpdated = datepart( FileUpdated );
 
   TimeCoveragePeriodStartDate = '01jan2000'd;
-  TimeCoveragePeriodEndDate = '31dec2011'd;
+  TimeCoveragePeriodEndDate = '31dec2015'd;
 
   **** HARD CODING THIS FOR NOW, BUT MAY WANT TO CHANGE LATER ****;
   PrimaryContact = "P Tatian";
@@ -185,46 +288,69 @@ data Data_test;
 
   Description = FileDesc;
   
-  ** TEMPORARY CODE **;
-  select( lowcase( substr( FileName, 11 ) ) );
-    when ( "_anc02" )
+  ** TEMPORARY CODE **;  
+  select( lowcase( scan( FileName, -1, '_' ) ) );
+    when ( "anc02" )
       Unitsofobservation = "Advisory Neighborhood Commission (2002)";
-    when ( "_anc12" )
+    when ( "anc12" )
       Unitsofobservation = "Advisory Neighborhood Commission (2012)";
-    when ( "_city" )
+    when ( "city" ) do;
       Unitsofobservation = "City total";
-    when ( "_cl00" )
+      ClByGeoLevelGeographicLevel = "City/Census Designated Place";
+    end;
+    when ( "cl00" ) do;
       Unitsofobservation = "Neighborhood cluster (2000)";
-    when ( "_cltr00" )
+      ClByGeoLevelGeographicLevel = "Neighborhood";
+    end;
+    when ( "cltr00" ) do;
       Unitsofobservation = "Neighborhood cluster (tract-based, 2000)";
-    when ( "_eor" )
+      ClByGeoLevelGeographicLevel = "Neighborhood";
+    end;
+    when ( "eor" )
       Unitsofobservation = "East of the Anacostia River";
-    when ( "_tr00" )
+    when ( "tr00" ) do;
       Unitsofobservation = "Census tract (2000)";
-    when ( "_tr10" )
+      ClByGeoLevelGeographicLevel = "Census Tract";
+    end;
+    when ( "tr10" ) do;
       Unitsofobservation = "Census tract (2010)";
-    when ( "_bg00" )
+      ClByGeoLevelGeographicLevel = "Census Tract";
+    end;
+    when ( "bg00" )
       Unitsofobservation = "Census block group (2000)";
-    when ( "_bg10" )
+    when ( "bg10" )
       Unitsofobservation = "Census block group (2010)";
-    when ( "_bl00" )
+    when ( "bl00" )
       Unitsofobservation = "Census block (2000)";
-    when ( "_bl10" )
+    when ( "bl10" )
       Unitsofobservation = "Census block (2010)";
-    when ( "_psa04" )
+    when ( "psa04" ) do;
       Unitsofobservation = "Police Service Area (2004)";
-    when ( "_psa12" )
+      ClByGeoLevelGeographicLevel = "Police District";
+    end;
+    when ( "psa12" ) do;
       Unitsofobservation = "Police Service Area (2012)";
-    when ( "_vp12" )
+      ClByGeoLevelGeographicLevel = "Police District";
+    end;
+    when ( "vp12" ) do;
       Unitsofobservation = "Voting Precinct (2012)";
-    when ( "_wd02" )
+      ClByGeoLevelGeographicLevel = "Voting District";
+    end;
+    when ( "wd02" )
       Unitsofobservation = "Ward (2002)";
-    when ( "_wd12" )
+    when ( "wd12" )
       Unitsofobservation = "Ward (2012)";
-    when ( "_zip" )
+    when ( "zip" )
       Unitsofobservation = "ZIP code (5 digit)";
+    when ( "2015", "2014", "2013", "2012", "2011", "2010", "2009", "2008", "2007", "2006", "2005", "2004", "2003", "2002", "2001", "2000" ) do;
+      Unitsofobservation = "Reported crime incident";
+      ClByGeoLevelGeographicLevel = "Latitude/Longitude";
+      File_year = input( scan( FileName, -1, '_' ), 16. );
+      TimeCoveragePeriodStartDate = mdy( 1, 1, File_year );
+      TimeCoveragePeriodEndDate = mdy( 12, 31, File_year );
+    end;
     otherwise do;
-      %err_put( msg="NOT FOUND!" )
+      %err_put( msg="GEOGRAPHY NOT FOUND!" )
       Unitsofobservation = "Unknown";
     end;
   end;
@@ -236,7 +362,7 @@ data Data_test;
   UniverseTargetPopulation = "Reported part 1 crimes, DC";
   Individualdatasetsinseries = "";
   
-  LocationtoAccesstheData = "SAS1 server, DCData/Libraries/Police";
+  LocationtoAccesstheData = "SAS1 server, DCData/Libraries/" || left( propcase( Library ) );
   
   AdditionalNotes = "";
 
@@ -246,83 +372,199 @@ data Data_test;
   
   Library = propcase( Library );
   
+  ** Numeric variable descriptive stats **;
   
-  ** Generate output obs for each R&R category, numeric var, and categorical var **;
+  if not( missing( _desc_n ) ) then do;
   
-  array _RRCat{*} _RRCat1-_RRCat&RRCATMAX;
-  
-  _RRCategories = "Neighborhoods, Cities, and Metros|Crime and Justice";
-  
-  ** Parse R&R categories **;
-  
-  do i = 1 to &RRCATMAX;
-    _RRCat{i} = scan( _RRCategories, i, '|' );
-    if _RRCat{i} = "" then leave;
+    if VarFmt ~= "" and index( %upcase(&date_fmts), compress( "/" || VarFmt || "/" ) ) then do;
+
+      ** Variable is a date value **;
+    
+      NumericVariableDescriptors = 
+      
+        "<table style=""border-collapse: collapse;"">" ||
+        
+        "<tr>" ||
+        "<th style=""border-bottom: 1px solid #000; padding: 2px 10px 2px 10px;"">" ||
+        trim( VarDesc ) || " [SAS date value]" ||
+        "</th>" ||
+        "<th style=""border-bottom: 1px solid #000; padding: 2px 10px 2px 10px;"">N</th>" || 
+        "<th style=""border-bottom: 1px solid #000; padding: 2px 10px 2px 10px;"">Mean</th>" || 
+        "<th style=""border-bottom: 1px solid #000; padding: 2px 10px 2px 10px;"">StdDev (days)</th>" || 
+        "<th style=""border-bottom: 1px solid #000; padding: 2px 10px 2px 10px;"">Min</th>" || 
+        "<th style=""border-bottom: 1px solid #000; padding: 2px 10px 2px 10px;"">Max</th>" || 
+        "</tr>" ||
+
+        "<tr>" ||
+        "<td style=""padding: 2px 10px 2px 10px;"">" ||
+        trim( VarName ) ||
+        "</td>" ||
+        "<td style=""padding: 2px 10px 2px 10px;"">" ||
+        trim( left( put( _desc_n, comma16. ) ) ) ||
+        "</td>" ||
+        "<td style=""padding: 2px 10px 2px 10px;"">" ||
+        trim( left( put( _desc_mean, mmddyy10. ) ) ) ||
+        "</td>" ||
+        "<td style=""padding: 2px 10px 2px 10px;"">" ||
+        trim( left( _desc_std ) ) ||
+        "</td>" ||
+        "<td style=""padding: 2px 10px 2px 10px;"">" ||
+        trim( left( put( _desc_min, mmddyy10. ) ) ) ||
+        "</td>" ||
+        "<td style=""padding: 2px 10px 2px 10px;"">" ||
+        trim( left( put( _desc_max, mmddyy10. ) ) ) ||
+        "</td>" ||
+        "</tr>" ||
+        
+        "</table>"
+      ;
+      
+    end;
+    else do;
+    
+      ** Variable not a date value **;
+    
+      NumericVariableDescriptors = 
+      
+        "<table style=""border-collapse: collapse;"">" ||
+        
+        "<tr>" ||
+        "<th style=""border-bottom: 1px solid #000; padding: 2px 10px 2px 10px;"">" ||
+        trim( VarDesc ) ||
+        "</th>" ||
+        "<th style=""border-bottom: 1px solid #000; padding: 2px 10px 2px 10px;"">N</th>" || 
+        "<th style=""border-bottom: 1px solid #000; padding: 2px 10px 2px 10px;"">Sum</th>" || 
+        "<th style=""border-bottom: 1px solid #000; padding: 2px 10px 2px 10px;"">Mean</th>" || 
+        "<th style=""border-bottom: 1px solid #000; padding: 2px 10px 2px 10px;"">StdDev</th>" || 
+        "<th style=""border-bottom: 1px solid #000; padding: 2px 10px 2px 10px;"">Min</th>" || 
+        "<th style=""border-bottom: 1px solid #000; padding: 2px 10px 2px 10px;"">Max</th>" || 
+        "</tr>" ||
+
+        "<tr>" ||
+        "<td style=""padding: 2px 10px 2px 10px;"">" ||
+        trim( VarName ) ||
+        "</td>" ||
+        "<td style=""padding: 2px 10px 2px 10px;"">" ||
+        trim( left( put( _desc_n, comma32. ) ) ) ||
+        "</td>" ||
+        "<td style=""padding: 2px 10px 2px 10px;"">" ||
+        trim( left( _desc_sum ) ) ||
+        "</td>" ||
+        "<td style=""padding: 2px 10px 2px 10px;"">" ||
+        trim( left( _desc_mean ) ) ||
+        "</td>" ||
+        "<td style=""padding: 2px 10px 2px 10px;"">" ||
+        trim( left( _desc_std ) ) ||
+        "</td>" ||
+        "<td style=""padding: 2px 10px 2px 10px;"">" ||
+        trim( left( _desc_min ) ) ||
+        "</td>" ||
+        "<td style=""padding: 2px 10px 2px 10px;"">" ||
+        trim( left( _desc_max ) ) ||
+        "</td>" ||
+        "</tr>" ||
+        
+        "</table>"
+      ;
+      
+    end;    
+      
   end;
   
-  _RRCatNum = i - 1;
-  PUT _RRCATNUM=;
-
-  NumericVariableDescriptors = 
+  ** Categorical variable value descriptors **;
   
-  "<table style=""border-collapse: collapse;"">" ||
+  array Fval_val{*} Fval_val1-Fval_val&FVALMAX;
+  array Fval_fval{*} Fval_fval1-Fval_fval&FVALMAX;
+  array Fval_freq{*} Fval_freq1-Fval_freq&FVALMAX;
   
-  "<tr>" ||
-  "<th style=""border-bottom: 1px solid #000; padding: 2px 10px 2px 10px;"">" ||
-  trim( VarDesc ) ||
-  "</th>" ||
-  "<th style=""border-bottom: 1px solid #000; padding: 2px 10px 2px 10px;"">N</th>" || 
-  "<th style=""border-bottom: 1px solid #000; padding: 2px 10px 2px 10px;"">Sum</th>" || 
-  "<th style=""border-bottom: 1px solid #000; padding: 2px 10px 2px 10px;"">Mean</th>" || 
-  "<th style=""border-bottom: 1px solid #000; padding: 2px 10px 2px 10px;"">StdDev</th>" || 
-  "<th style=""border-bottom: 1px solid #000; padding: 2px 10px 2px 10px;"">Min</th>" || 
-  "<th style=""border-bottom: 1px solid #000; padding: 2px 10px 2px 10px;"">Max</th>" || 
-  "</tr>" ||
+  if Fval_count > 0 then do;
 
-  "<tr>" ||
-  "<td style=""padding: 2px 10px 2px 10px;"">" ||
-  trim( VarName ) ||
-  "</td>" ||
-  "<td style=""padding: 2px 10px 2px 10px;"">" ||
-  trim( left( _desc_n ) ) ||
-  "</td>" ||
-  "<td style=""padding: 2px 10px 2px 10px;"">" ||
-  trim( left( _desc_sum ) ) ||
-  "</td>" ||
-  "<td style=""padding: 2px 10px 2px 10px;"">" ||
-  trim( left( _desc_mean ) ) ||
-  "</td>" ||
-  "<td style=""padding: 2px 10px 2px 10px;"">" ||
-  trim( left( _desc_std ) ) ||
-  "</td>" ||
-  "<td style=""padding: 2px 10px 2px 10px;"">" ||
-  trim( left( _desc_min ) ) ||
-  "</td>" ||
-  "<td style=""padding: 2px 10px 2px 10px;"">" ||
-  trim( left( _desc_max ) ) ||
-  "</td>" ||
-  "</tr>" ||
-  
-  "</table>"
-  ;
+    CategoricalVariableDescriptors = 
 
-  CategoricalVariableDescriptors = "";
-
-  /*
-  CategoricalVariableDescriptors = "<table style=""border-collapse: collapse;"">" ||
-  "<tr><th style=""border-bottom: 1px solid #000; padding: 2px 10px 2px 10px;"">Variable</th><th style=""border-bottom: 1px solid #000; padding: 2px 10px 2px 10px;"">N</th></tr>" ||
-  "<tr><td style=""padding: 2px 10px 2px 10px;"">Ward</td><td style=""padding: 2px 10px 2px 10px;"">1</td></tr>" ||
-  "<tr><td style=""background-color: #EEE; padding: 2px 10px 2px 10px;"">Ward</td><td style=""background-color: #EEE; padding: 2px 10px 2px 10px;"">2</td></tr>" ||
-  "<tr><td style=""padding: 2px 10px 2px 10px;"">Ward</td><td style=""padding: 2px 10px 2px 10px;"">3</td></tr>" ||
-  "<tr><td style=""background-color: #EEE; padding: 2px 10px 2px 10px;"">Ward</td><td style=""background-color: #EEE; padding: 2px 10px 2px 10px;"">4</td></tr>" ||
-  "</table>"
-  ;
-  */
-  
+      "<table style=""border-collapse: collapse;"">" ||
+      
+      "<tr>" ||
+      "<th style=""border-bottom: 1px solid #000; padding: 2px 10px 2px 10px;"" colspan=""3"">" ||
+      trim( VarName ) || " - " || trim( VarDesc ) ||
+      "</th></tr><tr>" ||
+      "<th align=""left"" style=""border-bottom: 1px solid #000; padding: 2px 10px 2px 10px;"">Value</th>" || 
+      "<th align=""left"" style=""border-bottom: 1px solid #000; padding: 2px 10px 2px 10px;"">Formatted value (" || trim(VarFmt) || ")</th>" || 
+      "<th align=""left"" style=""border-bottom: 1px solid #000; padding: 2px 10px 2px 10px;"">N</th>" || 
+      "</tr>";
+      
+    do i = 1 to Fval_count;  /**** TEMPORARY FIX: NEED TO SOLVE TRUNCATION PROBLEM ****/
+    
+      if mod( i, 2 ) then do;
+    
+        CategoricalVariableDescriptors = trim( CategoricalVariableDescriptors ) ||
+          "<tr>" ||
+          "<td style=""padding: 2px 10px 2px 10px;"">" ||
+          trim( Fval_val{i} ) ||
+          "</td>" ||
+          "<td style=""padding: 2px 10px 2px 10px;"">" ||
+          trim( Fval_fval{i} ) ||
+          "</td>" ||
+          "<td style=""padding: 2px 10px 2px 10px;"">" ||
+          trim( left( Fval_freq{i} ) ) ||
+          "</td>" ||
+          "</tr>"
+        ;
+        
+      end;
+      else do;
+        
+        CategoricalVariableDescriptors = trim( CategoricalVariableDescriptors ) ||
+          "<tr>" ||
+          "<td style=""background-color: #EEE; padding: 2px 10px 2px 10px;"">" ||
+          trim( Fval_val{i} ) ||
+          "</td>" ||
+          "<td style=""background-color: #EEE; padding: 2px 10px 2px 10px;"">" ||
+          trim( Fval_fval{i} ) ||
+          "</td>" ||
+          "<td style=""background-color: #EEE; padding: 2px 10px 2px 10px;"">" ||
+          trim( left( Fval_freq{i} ) ) ||
+          "</td>" ||
+          "</tr>"
+        ;
+              
+      end;
+      
+    end;
+      
+    if MaxFmtVals > 0 then do;
+    
+      CategoricalVariableDescriptors = trim( CategoricalVariableDescriptors ) ||
+        "<tr>" ||
+        "<td align=""left"" style=""padding: 2px 10px 2px 10px;"" colspan=""3""><i>Only first " || trim( left( MaxFmtVals ) ) || " values shown.</i>" ||
+        "</td>" ||
+        "</tr>"
+      ;
+      
+    end;
+    
+    CategoricalVariableDescriptors = trim( CategoricalVariableDescriptors ) || "</table>";
+    
+  end;
+    
   if first.Filename then do;
   
     ClByRRCategoryRRCategory = "";
     
+    ** Generate output obs for each R&R category, numeric var, and categorical var **;
+    
+    array _RRCat{*} _RRCat1-_RRCat&RRCATMAX;
+    
+    _RRCategories = "Neighborhoods, Cities, and Metros|Crime and Justice";
+    
+    ** Parse R&R categories **;
+    
+    do i = 1 to &RRCATMAX;
+      _RRCat{i} = scan( _RRCategories, i, '|' );
+      if _RRCat{i} = "" then leave;
+    end;
+    
+    _RRCatNum = i - 1;
+
   end;
   
   if last.FileName then do;
