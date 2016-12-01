@@ -27,7 +27,7 @@ proc sort data=Metadata.Meta_vars out=Meta_vars;
 
 ** Create export file **;
 
-data Test;
+data Data_test;
 
   length
     Type $ 40
@@ -38,9 +38,7 @@ data Test;
     DomainType $ 40
     Domain $ 40
     Name $ 40
-    RolesPrimaryContactFirstName $ 40
-    RolesPrimaryContactLastName $ 40
-    RolesPrimaryContactUserName $ 40
+    PrimaryContact $ 40
     FrequencyofUpdate $ 40
     ClByGeoLevelType $ 40
     ClByGeoLevelCommunity $ 40
@@ -134,13 +132,10 @@ data Test;
   ** Data set specific value variables **;
   
   retain
-    Type
     LastUpdated
     TimeCoveragePeriodStartDate
     TimeCoveragePeriodEndDate
-    RolesPrimaryContactFirstName
-    RolesPrimaryContactLastName 
-    RolesPrimaryContactUserName
+    PrimaryContact 
     FrequencyofUpdate 
     ClByGeoLevelGeographicLevel 
     ClByRRCategoryRRCategory
@@ -181,9 +176,7 @@ data Test;
   TimeCoveragePeriodEndDate = '31dec2011'd;
 
   **** HARD CODING THIS FOR NOW, BUT MAY WANT TO CHANGE LATER ****;
-  RolesPrimaryContactFirstName = "P";        
-  RolesPrimaryContactLastName = "Tatian";
-  RolesPrimaryContactUserName = "Peter";
+  PrimaryContact = "P Tatian";
   
   FrequencyofUpdate = "Annual";
   ClByGeoLevelGeographicLevel = "Not on this list";
@@ -237,7 +230,7 @@ data Test;
   end;
 
   Originaldatasourceinformation = "DC Open Data";
-  URLoforiginaldatasource = '<a href="http://opendata.dc.gov/"></a>';
+  URLoforiginaldatasource = '<a href="http://opendata.dc.gov/">opendata.dc.gov/</a>';
   ProjectCode = "";
   
   UniverseTargetPopulation = "Reported part 1 crimes, DC";
@@ -368,9 +361,7 @@ data Test;
     DomainType = "Domain Type"
     Domain = "Domain"
     Name = "Name"
-    RolesPrimaryContactFirstName = "Roles > Primary Contact > First Name"
-    RolesPrimaryContactLastName = "Roles > Primary Contact > Last Name"
-    RolesPrimaryContactUserName = "Roles > Primary Contact > User Name"
+    PrimaryContact = "Primary Contact"
     FrequencyofUpdate = "Frequency of Update"
     ClByGeoLevelType = "Classified by [Geographic Level] > Type"
     ClByGeoLevelCommunity = "Classified by [Geographic Level] > Community"
@@ -431,9 +422,7 @@ data Test;
     DomainType
     Domain
     Name
-    RolesPrimaryContactFirstName
-    RolesPrimaryContactLastName
-    RolesPrimaryContactUserName
+    PrimaryContact
     FrequencyofUpdate
     ClByGeoLevelType
     ClByGeoLevelCommunity
@@ -487,12 +476,12 @@ data Test;
 
 run;
 
-%File_info( data=Test, printobs=0 )
+%File_info( data=Data_test, printobs=0 )
 
 /*
-filename fexport "Collibra_test.csv" lrecl=5000;
+filename fexport "Collibra_Data_test.csv" lrecl=5000;
 
-proc export data=Test
+proc export data=Data_test
     outfile=fexport
     dbms=csv label replace;
 
@@ -501,14 +490,14 @@ run;
 filename fexport clear;
 */
 
-ods csvall body="Collibra_test.csv";
+ods csvall body="Collibra_data_test.csv";
 ods listing close;
 
 title;
 footnote;
 options missing=' ';
 
-proc print data=Test label noobs;
+proc print data=Data_test label noobs;
 run;
 
 ods csvall close;
