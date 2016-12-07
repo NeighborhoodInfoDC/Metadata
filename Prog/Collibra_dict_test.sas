@@ -19,7 +19,7 @@
 %DCData_lib( Metadata, local=n )
 
 %let Library_select = POLICE;
-%let File_select = CRIMES_SUM;
+%let File_select = CRIMES_2;
 
 ** Create export file **;
 
@@ -37,7 +37,7 @@ data Dict_test;
     ispartofDataSetCommunity $ 40
     ispartofDataSetDomainType $ 40
     ispartofDataSetDomain $ 40
-    ispartofDataSetDataSet $ 40
+    ispartofDataSetDataSet $ 80
   ;
   
   ** Constant value variables (same for all data sets) **;
@@ -66,9 +66,9 @@ data Dict_test;
   by Library FileName;
   where upcase(Library) = "%upcase(&Library_select)" and upcase(FileName) =: "%upcase(&File_select)";
   
-  Name = VarName;
+  Name = propcase( VarName );
   Description = VarDesc;
-  ispartofDataSetDataSet = propcase( FileName );
+  ispartofDataSetDataSet = trim( propcase( Library ) ) || '.' || propcase( FileName );
 
   label
     Type = "Type"

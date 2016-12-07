@@ -1,5 +1,5 @@
 /**************************************************************************
- Program:  Collibra_test.sas
+ Program:  Collibra_data_test.sas
  Library:  Metadata
  Project:  NeighborhoodInfo DC
  Author:   P. Tatian
@@ -8,6 +8,7 @@
  Environment:  Local Windows session (desktop)
  
  Description:  Test exporting NIDC metadata to Collibra.
+ Data sets
 
  Modifications:
 **************************************************************************/
@@ -18,10 +19,10 @@
 %DCData_lib( Metadata, local=n )
 
 %let Library_select = POLICE;
-%let File_select = CRIMES_SUM;
+%let File_select = CRIMES_2;
 
 %let RRCATMAX = 10;
-%let FVALMAX = 80;
+%let FVALMAX = 100;
 
 %let date_fmts =
   "/DATE/DATEAMPM/DATETIME/DAY/DDMMYY/" ||
@@ -138,7 +139,7 @@ data Data_test;
     Community $ 40
     DomainType $ 40
     Domain $ 40
-    Name $ 40
+    Name $ 80
     PrimaryContact $ 40
     FrequencyofUpdate $ 40
     ClByGeoLevelType $ 40
@@ -272,13 +273,18 @@ data Data_test;
   by Library FileName;
   where upcase(Library) = "%upcase(&Library_select)" and upcase(FileName) =: "%upcase(&File_select)";
   
-  Name = propcase( FileName );
+  Name = trim( propcase( Library ) ) || '.' || propcase( FileName );
   LastUpdated = datepart( FileUpdated );
+
+  Description = FileDesc;
+  
+  Library = propcase( Library );
+  
+  **** HARD CODING THESE FIELDS FOR NOW, WILL WANT TO CHANGE LATER ****;
 
   TimeCoveragePeriodStartDate = '01jan2000'd;
   TimeCoveragePeriodEndDate = '31dec2015'd;
 
-  **** HARD CODING THIS FOR NOW, BUT MAY WANT TO CHANGE LATER ****;
   PrimaryContact = "P Tatian";
   
   FrequencyofUpdate = "Annual";
@@ -286,9 +292,6 @@ data Data_test;
 
   ClByRestrictionRestriction = "Public";
 
-  Description = FileDesc;
-  
-  ** TEMPORARY CODE **;  
   select( lowcase( scan( FileName, -1, '_' ) ) );
     when ( "anc02" )
       Unitsofobservation = "Advisory Neighborhood Commission (2002)";
@@ -370,7 +373,7 @@ data Data_test;
   CommentsonDataQuality = "";
   LinktoDataUseAgreementorMOU = "";
   
-  Library = propcase( Library );
+  **** END HARD CODING ****************************************************;
   
   ** Numeric variable descriptive stats **;
   
