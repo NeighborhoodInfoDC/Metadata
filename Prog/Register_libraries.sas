@@ -149,6 +149,11 @@
 )
 
 %DC_update_meta_library(
+  lib_name=mola,
+  lib_desc=%str(DC Mayor%'s Office on Latino Affairs)
+)
+
+%DC_update_meta_library(
   lib_name=mris,
   lib_desc=Metropolitan Regional Information Systems (regional real estate sales and listings)
 )
@@ -231,6 +236,11 @@
 %DC_update_meta_library(
   lib_name=vital,
   lib_desc=Vital statistics (births & deaths)
+)
+
+%DC_update_meta_library(
+  lib_name=voices,
+  lib_desc=VoicesDMV survey
 )
 
 %DC_update_meta_library(
