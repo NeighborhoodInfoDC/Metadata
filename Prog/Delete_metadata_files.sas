@@ -38,10 +38,8 @@ run;
 
 ** Delete files from metadata system **;
 
-%DC_delete_meta_file( ds_lib=PresCat, ds_name=Project )
-%DC_delete_meta_file( ds_lib=PresCat, ds_name=Project_update_history )
-%DC_delete_meta_file( ds_lib=PresCat, ds_name=Subsidy )
-%DC_delete_meta_file( ds_lib=PresCat, ds_name=Subsidy_update_history )
+%DC_delete_meta_file( ds_lib=ACS, ds_name=Acs_sf_2009_13_dc_bg10 )
+%DC_delete_meta_file( ds_lib=ACS, ds_name=Acs_sf_2009_13_dc_tr10 )
 
 run;
 

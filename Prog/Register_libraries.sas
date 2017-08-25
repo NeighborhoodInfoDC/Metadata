@@ -23,6 +23,10 @@
          meta_lib=Metadata )
 /***/
 
+%Delete_metadata_library(  
+         ds_lib=mola,
+         meta_lib=Metadata )
+
 %DC_update_meta_library(
   lib_name=acip,
   lib_desc=Arts & Culture Indicators Project
@@ -76,6 +80,11 @@
 %DC_update_meta_library(
   lib_name=dccash,
   lib_desc=DC CASH Campaign
+)
+
+%DC_update_meta_library(
+  lib_name=dcola,
+  lib_desc=%str(DC Mayor%'s Office on Latino Affairs)
 )
 
 %DC_update_meta_library(
@@ -146,11 +155,6 @@
 %DC_update_meta_library(
   lib_name=mar,
   lib_desc=DC Master Address Repository (MAR)
-)
-
-%DC_update_meta_library(
-  lib_name=mola,
-  lib_desc=%str(DC Mayor%'s Office on Latino Affairs)
 )
 
 %DC_update_meta_library(
