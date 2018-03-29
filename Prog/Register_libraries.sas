@@ -9,7 +9,7 @@
  
  Description:  Register libraries in metadata system.
 
- Modifications: 03/29/18 RP Update for DDOT Repo.
+ Modifications: 03/29/18 RP Update for DDOT and StanC Repos.
 **************************************************************************/
 
 %include "L:\SAS\Inc\StdLocal.sas";
@@ -23,9 +23,6 @@
          meta_lib=Metadata )
 /***/
 
-%Delete_metadata_library(  
-         ds_lib=mola,
-         meta_lib=Metadata )
 
 %DC_update_meta_library(
   lib_name=acip,
@@ -235,6 +232,11 @@
 %DC_update_meta_library(
   lib_name=schools,
   lib_desc=%str(Public, public charter, and private schools)
+)
+
+%DC_update_meta_library(
+  lib_name=stanc,
+  lib_desc=%str(The Commons at Stanton Square)
 )
 
 %DC_update_meta_library(
