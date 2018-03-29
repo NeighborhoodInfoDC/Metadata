@@ -9,7 +9,7 @@
  
  Description:  Register libraries in metadata system.
 
- Modifications:
+ Modifications: 03/29/18 RP Update for DDOT Repo.
 **************************************************************************/
 
 %include "L:\SAS\Inc\StdLocal.sas";
@@ -85,6 +85,11 @@
 %DC_update_meta_library(
   lib_name=dcola,
   lib_desc=%str(DC Mayor%'s Office on Latino Affairs)
+)
+
+%DC_update_meta_library(
+  lib_name=ddot,
+  lib_desc=%str(District Department of Transportation)
 )
 
 %DC_update_meta_library(
