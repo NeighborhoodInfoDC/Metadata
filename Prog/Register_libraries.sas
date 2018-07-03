@@ -99,6 +99,12 @@
   lib_desc=DC Dept of Housing and Community Development
 )
 
+
+%DC_update_meta_library(
+  lib_name=dmped,
+  lib_desc=DC Deputy Mayor for Planning & Economic Development (DMPED)
+)
+
 %DC_update_meta_library(
   lib_name=DYouth,
   lib_desc=DC Disconnected Youth Study
