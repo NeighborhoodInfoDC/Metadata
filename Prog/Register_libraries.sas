@@ -161,8 +161,8 @@
 )
 
 %DC_update_meta_library(
-  lib_name=LEHD,
-  lib_desc=%str(Longitudinal Employer-Household Dynamics)
+  lib_name=LEHD,
+  lib_desc=%str(Longitudinal Employer Household Dynamics)
 )
 
 %DC_update_meta_library(
