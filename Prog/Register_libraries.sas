@@ -235,6 +235,12 @@
   lib_desc=Real property data (property sales, real estate assessments and taxes, land use)
 )
 
+
+%DC_update_meta_library(
+  lib_name=reghsg,
+  lib_desc=%str(Regional Housing Framework)
+)
+
 %DC_update_meta_library(
   lib_name=requests,
   lib_desc=NeighborhoodInfo DC data requests
