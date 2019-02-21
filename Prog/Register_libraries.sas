@@ -10,6 +10,7 @@
  Description:  Register libraries in metadata system.
 
  Modifications: 03/29/18 RP Update for DDOT and StanC Repos.
+			    02/21/19 RP Add BLS 
 **************************************************************************/
 
 %include "L:\SAS\Inc\StdLocal.sas";
@@ -37,6 +38,11 @@
 %DC_update_meta_library(
   lib_name=Bainum,
   lib_desc=Bainum Family Foundation project
+)
+
+%DC_update_meta_library(
+  lib_name=BLS,
+  lib_desc=US Bureau of Labor Statistics
 )
 
 %DC_update_meta_library(
