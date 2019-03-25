@@ -11,6 +11,7 @@
 
  Modifications: 03/29/18 RP Update for DDOT and StanC Repos.
 			    02/21/19 RP Add BLS 
+                03/25/19 RP Add DCRA
 **************************************************************************/
 
 %include "L:\SAS\Inc\StdLocal.sas";
@@ -93,6 +94,11 @@
 %DC_update_meta_library(
   lib_name=dcola,
   lib_desc=%str(DC Mayor%'s Office on Latino Affairs)
+)
+
+%DC_update_meta_library(
+  lib_name=dcra,
+  lib_desc=%str(Department of Consumer and Regulatory Affairs)
 )
 
 %DC_update_meta_library(
