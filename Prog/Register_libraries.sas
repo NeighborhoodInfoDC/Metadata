@@ -37,6 +37,11 @@
 )
 
 %DC_update_meta_library(
+  lib_name=ahs,
+  lib_desc=American Housing Survey
+)
+
+%DC_update_meta_library(
   lib_name=Bainum,
   lib_desc=Bainum Family Foundation project
 )
