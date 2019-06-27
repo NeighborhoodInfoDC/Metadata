@@ -208,6 +208,11 @@
 )
 
 %DC_update_meta_library(
+  lib_name=nchsg,
+  lib_desc=North Carolina Housing Assessment
+)
+
+%DC_update_meta_library(
   lib_name=nlihc,
   lib_desc=National Low Income Housing Coalition Preservation Catalog
 )
