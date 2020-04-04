@@ -82,6 +82,11 @@
 )
 
 %DC_update_meta_library(
+  lib_name=Covid19,
+  lib_desc=Covid-19 response data and analysis
+)
+
+%DC_update_meta_library(
   lib_name=CPS,
   lib_desc=Current Population Survey
 )
