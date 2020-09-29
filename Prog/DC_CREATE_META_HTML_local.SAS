@@ -17,9 +17,10 @@
    10/12/11 PAT Added email notification for start, finish, errors.
    01/14/14 PAT Updated for new SAS1 server.
    01/31/14 PAT Created local windows session version. 
+   09/29/20 RP Update header path. 
 ************************************************************************;
 
-%include "L:\SAS\Inc\StdLocal.sas";
+%include "\\sas1\DCDATA\SAS\Inc\StdLocal.sas";
 
 ** Define libraries **;
 %DCData_lib( Metadata, local=n )
