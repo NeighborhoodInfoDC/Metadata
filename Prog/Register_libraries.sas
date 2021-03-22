@@ -12,6 +12,7 @@
  Modifications: 03/29/18 RP Update for DDOT and StanC Repos.
 			    02/21/19 RP Add BLS 
                 03/25/19 RP Add DCRA
+                3/22/21 YS add RegAI
 **************************************************************************/
 
 %include "L:\SAS\Inc\StdLocal.sas";
@@ -311,6 +312,11 @@
 %DC_update_meta_library(
   lib_name=wawf,
   lib_desc=Washington Area Womens Foundation
+)
+
+%DC_update_meta_library(
+  lib_name=RegAI,
+  lib_desc=%str(Regional AI)
 )
 
 proc print data=metadata.meta_libs noobs label;
