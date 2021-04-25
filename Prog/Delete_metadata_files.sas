@@ -13,7 +13,7 @@
   09/02/15 PAT Update for SAS1 server.
 **************************************************************************/
 
-%include "L:\SAS\Inc\StdLocal.sas";
+%include "\\sas1\DCdata\SAS\Inc\StdLocal.sas";
 
 /** Macro DC_delete_meta_file - Start Definition **/
 
