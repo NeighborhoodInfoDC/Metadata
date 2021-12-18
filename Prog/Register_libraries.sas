@@ -259,6 +259,11 @@
 )
 
 %DC_update_meta_library(
+  lib_name=purple,
+  lib_desc=Purple Line equitable development project
+)
+
+%DC_update_meta_library(
   lib_name=realprop,
   lib_desc=Real property data (property sales, real estate assessments and taxes, land use)
 )
