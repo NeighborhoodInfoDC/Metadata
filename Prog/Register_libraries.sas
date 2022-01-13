@@ -321,12 +321,13 @@
 
 %DC_update_meta_library(
   lib_name=RegAI,
-  lib_desc=%str(Regional AI)
+  lib_desc=%str(Regional AI))
 
 
 %DC_update_meta_library(
   lib_name=AmzHsg,
-  lib_desc=%str(Amazon Housing Equity Fund)
+  lib_desc=Amazon Housing Equity Fund
+)
 
 
 proc print data=metadata.meta_libs noobs label;
