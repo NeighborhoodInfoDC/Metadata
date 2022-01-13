@@ -326,8 +326,8 @@
 
 %DC_update_meta_library(
   lib_name=AmzHsg,
-  lib_desc=%str(Amazong Housing Equity Fund)
-)
+  lib_desc=%str(Amazon Housing Equity Fund)
+
 
 proc print data=metadata.meta_libs noobs label;
   title3 'Registered Libraries';
