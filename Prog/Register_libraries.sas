@@ -322,7 +322,7 @@
 %DC_update_meta_library(
   lib_name=RegAI,
   lib_desc=%str(Regional AI)
-)
+
 
 %DC_update_meta_library(
   lib_name=AmzHsg,
