@@ -329,6 +329,11 @@
   lib_desc=%str(Amazon Housing Equity Fund)
 )
 
+%DC_update_meta_library(
+  lib_name=HAND,
+  lib_desc=%str(The Housing Association of Nonprofit Developers (HAND))
+)
+
 
 proc print data=metadata.meta_libs noobs label;
   title3 'Registered Libraries';
