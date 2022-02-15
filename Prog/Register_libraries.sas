@@ -154,6 +154,11 @@
 )
 
 %DC_update_meta_library(
+  lib_name=hand,
+  lib_desc=HAND Housing Indicators Tool
+)
+
+%DC_update_meta_library(
   lib_name=hmda,
   lib_desc=Home Mortgage Disclosure Act (mortgage lending)
 )
