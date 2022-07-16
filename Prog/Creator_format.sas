@@ -65,6 +65,9 @@ proc format library=Metadata;
     "ysu" = "Y Su"
     "oarena" = "O Arena"
     "nstrayer" = "N Strayer"
+    "ahariharan" = "A Hariharan"
+    "eburton" = "E Burton"
+    "dharvey" = "D Harvey"
   ;
 
 run;
