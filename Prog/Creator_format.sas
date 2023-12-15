@@ -68,6 +68,7 @@ proc format library=Metadata;
     "ahariharan" = "A Hariharan"
     "eburton" = "E Burton"
     "dharvey" = "D Harvey"
+    "rgarcia" = "R Garcia"
   ;
 
 run;
