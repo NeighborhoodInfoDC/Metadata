@@ -234,13 +234,18 @@
 )
 
 %DC_update_meta_library(
-  lib_name=prescat,
-  lib_desc=%str(DC Preservation Catalog)
+  lib_name=occ,
+  lib_desc=Our Changing City web feature
 )
 
 %DC_update_meta_library(
   lib_name=octo,
   lib_desc=DC Office of the Chief Technology Officer
+)
+
+%DC_update_meta_library(
+  lib_name=prescat,
+  lib_desc=%str(DC Preservation Catalog)
 )
 
 %DC_update_meta_library(
