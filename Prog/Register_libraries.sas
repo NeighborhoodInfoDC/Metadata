@@ -139,6 +139,11 @@
 )
 
 %DC_update_meta_library(
+  lib_name=Evict,
+  lib_desc=Eviction data and analysis
+)
+
+%DC_update_meta_library(
   lib_name=FairHsng,
   lib_desc=DC Analysis of Impediments to Fair Housing 
 )
