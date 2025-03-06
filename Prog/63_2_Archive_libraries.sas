@@ -18,11 +18,11 @@
 ** Define libraries **;
 %DCData_lib( Metadata )
 
-options noxwait;
+options noxwait xmin;
 
 
 ** Archive entire library **;
-/**%Archive_metadata_lib( ds_lib=ACIP, meta_lib=metadata, html_folder=\\sas1\DCDATA\Metadata\, html_pre=meta, html_suf=html )**/
+%Archive_metadata_lib( ds_lib=ACIP, meta_lib=metadata, html_folder=\\sas1\DCDATA\Metadata\, html_pre=meta, html_suf=html )
 %Archive_metadata_lib( ds_lib=DCCASH, meta_lib=metadata, html_folder=\\sas1\DCDATA\Metadata\, html_pre=meta, html_suf=html )
 %Archive_metadata_lib( ds_lib=NAS, meta_lib=metadata, html_folder=\\sas1\DCDATA\Metadata\, html_pre=meta, html_suf=html )
 %Archive_metadata_lib( ds_lib=COMMFND, meta_lib=metadata, html_folder=\\sas1\DCDATA\Metadata\, html_pre=meta, html_suf=html )
