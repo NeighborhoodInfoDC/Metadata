@@ -1,9 +1,9 @@
 /**************************************************************************
- Program:  63_3_Archive_files.sas
+ Program:  63_4_Archive_files.sas
  Library:  Metadata
  Project:  Urban-Greater DC
  Author:   P. Tatian
- Created:  03/06/25
+ Created:  03/07/25
  Version:  SAS 9.4
  Environment:  Local Windows session (desktop)
  GitHub issue:  63
@@ -20,7 +20,6 @@
 
 options noxwait xmin;
 
-%Archive_metadata_file( ds_lib=CTPP, ds_days_old=1800, meta_lib=metadata, html_folder=\\sas1\DCDATA\Metadata\, html_pre=meta, html_suf=html )
-%Archive_metadata_file( ds_lib=BPERMITS, ds_days_old=1800, meta_lib=metadata, html_folder=\\sas1\DCDATA\Metadata\, html_pre=meta, html_suf=html )
+%Archive_metadata_file( ds_lib=ACS, ds_days_old=1800, meta_lib=metadata, html_folder=\\sas1\DCDATA\Metadata\, html_pre=meta, html_suf=html )
 
 run;
