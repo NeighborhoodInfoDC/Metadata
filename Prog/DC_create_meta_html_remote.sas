@@ -36,6 +36,7 @@ x "del /q &_dcdata_r_drive:\DCData\Metadata\*.html";
          rss_url= ,
          creator_fmt= $creator.,
          html_folder= &_dcdata_r_drive:\DCData\Metadata\,
+         html_link_folder=\\sas1\DCDATA\Metadata\,
          html_pre= meta,
          html_suf= html,
          html_title= Urban-Greater DC Metadata -,
