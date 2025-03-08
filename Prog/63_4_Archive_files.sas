@@ -20,6 +20,6 @@
 
 options noxwait xmin;
 
-%Archive_metadata_file( ds_lib=ACS, ds_days_old=1800, meta_lib=metadata, html_folder=\\sas1\DCDATA\Metadata\, html_pre=meta, html_suf=html )
+%Archive_metadata_file( ds_lib=ACS, ds_days_old=1000, meta_lib=metadata, html_folder=\\sas1\DCDATA\Metadata\, html_pre=meta, html_suf=html )
 
 run;
