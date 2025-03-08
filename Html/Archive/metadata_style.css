@@ -1,0 +1,38 @@
+BODY {
+		font-family: Arial;
+		font-style: none;
+		font-size: normal;
+		color: #000000;
+		background-color: #fef9e7;
+		text-decoration: none;
+		text-align: left;
+		margin-top: 10px;
+		margin-bottom: 10px;
+		margin-left: 10px;
+		margin-right: 10px;
+		border-top: none;
+}
+
+H1 {
+	COLOR: #0000C0; font-style: bold; FONT-FAMILY: Arial; font-size: 24;
+}
+
+H2 {
+	COLOR: #0000C0; font-style: bold; FONT-FAMILY: Arial; font-size: 18;
+}
+
+TH {
+	FONT-FAMILY: arial;
+	font-size: smaller;
+	font-style: bold; 
+}
+
+TD {
+	FONT-FAMILY: arial;
+	font-size: smaller;
+}
+
+SMALL {
+	font-family: arial;
+	font-size: smaller;
+}

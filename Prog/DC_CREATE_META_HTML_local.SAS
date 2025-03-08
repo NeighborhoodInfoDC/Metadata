@@ -25,7 +25,7 @@
 ** Define libraries **;
 %DCData_lib( Metadata, local=n )
 
-options noxwait;
+options noxwait xmin;
 x "del /q &_dcdata_r_drive:\Metadata\*.html";
 
 
