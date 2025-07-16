@@ -349,6 +349,11 @@
   lib_desc=%str(The Housing Association of Nonprofit Developers (HAND))
 )
 
+%DC_update_meta_library(
+  lib_name=Loudoun,
+  lib_desc=%str(Loudoun County)
+)
+
 
 proc print data=metadata.meta_libs noobs label;
   title3 'Registered Libraries';
