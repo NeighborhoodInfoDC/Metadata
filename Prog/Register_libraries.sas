@@ -63,12 +63,6 @@
 )
 
 %DC_update_meta_library(
-  lib_name=Catalog,
-  lib_desc=%str(Urban's Data Catalog)
-)
-
-
-%DC_update_meta_library(
   lib_name=CDC500,
   lib_desc=CDC 500 Cities project
 )
