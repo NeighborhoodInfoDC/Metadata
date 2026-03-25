@@ -63,8 +63,8 @@
 )
 
 %DC_update_meta_library(
-  lib_name=Catalog,
-  lib_desc=%str(Urban Data Catalog)
+  lib_name=Catalog,
+  lib_desc=Urban Data Catalog
 )
 
 %DC_update_meta_library(
